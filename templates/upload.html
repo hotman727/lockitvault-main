@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Files - LockItVault{% endblock %}
+
+{% block content %}
+<div class="upload-form-container">
+    <h1>UPLOAD</h1>
+    <form id="upload-form" method="post" action="{{ url_for('upload_file') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="upload-area" id="upload-area" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+            Drag & Drop files here or <label for="{{form.file.id}}" style="cursor: pointer; color: #bb86fc;">browse</label>
+            <!-- <input type="file" id="file-input" name="file" multiple style="display: none;"> -->
+            {{form.file(class_='upload_default_icon', id_='file-input')}}
+        </div>
+        <div class="upload-table-container">
+            <table class="file-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody id="file-list">
+                </tbody>
+            </table>
+        </div>
+        <div class="upload-button-container-left">
+            <button type="submit" id="upload-button" class="button">Upload</button>
+            <button type="button" id="folder-contents-button" class="button" onclick="window.location.href='{{ url_for( 'vault' ) }}';">Vault Contents</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

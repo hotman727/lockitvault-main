@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - LockItVault{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <h1>Profile</h1>
+    <div class="profile-section">
+        <h2>Basic Information</h2>
+        <form id="profile-info-form" method="post" action="{{ url_for('update_profile_info') }}" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" value="{{ user.name }}" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" value="{{ user.phone }}">
+            </div>
+            <div class="form-group">
+                <label for="profile_picture">Profile Picture:</label>
+                <input type="file" id="profile_picture" name="profile_picture">
+            </div>
+            <button type="submit" class="button">Update Information</button>
+        </form>
+    </div>
+
+    <div class="profile-section">
+        <h2>Subscription Details</h2>
+        <div class="subscription-info">
+            <p>Current Plan: <strong>{{ user.subscription_plan }}</strong></p>
+            <p>Storage Used: <strong>{{ user.storage_used }} GB</strong> of {{ user.storage_limit }} GB</p>
+        </div>
+    </div>
+
+    <div class="profile-section">
+        <h2>Security Settings</h2>
+            <form id="security-settings-form" method="post" action="{{ url_for('update_security_settings') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label for="two_fa_method">Two-Factor Authentication:</label>
+            <select id="two_fa_method" name="2fa_method">
+                <option value="none" {% if not user.two_fa_method %}selected{% endif %}>None</option>
+                <option value="sms" {% if user.two_fa_method == 'sms' %}selected{% endif %}>Text Message (SMS)</option>
+                <option value="email" {% if user.two_fa_method == 'email' %}selected{% endif %}>Email</option>
+                <option value="app" {% if user.two_fa_method == 'app' %}selected{% endif %}>Google Authenticator App</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="password">Change Password:</label>
+            <input type="password" id="password" name="password">
+        </div>
+        <button type="submit" class="button">Update Security Settings</button>
+    </form>
+    </div>
+
+    <div class="profile-section">
+        <h2>Activity Log</h2>
+        <table class="activity-log-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Activity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in user.activity_log %}
+                <tr>
+                    <td>{{ activity.date }}</td>
+                    <td>{{ activity.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="profile-section">
+        <h2>Account Preferences</h2>
+        <form id="account-preferences-form" method="post" action="{{ url_for('update_account_preferences') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="language">Language:</label>
+                <select id="language" name="language">
+                    <option value="en" {% if user.language == 'en' %}selected{% endif %}>English</option>
+                    <option value="es" {% if user.language == 'es' %}selected{% endif %}>Spanish</option>
+                    <!-- Add more languages as needed -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="notifications">Email Notifications:</label>
+                <input type="checkbox" id="notifications" name="notifications" {% if user.notifications %}checked{% endif %}>
+                <label for="notifications">Receive email notifications</label>
+            </div>
+            <div class="form-group">
+                <label for="timezone">Time Zone:</label>
+                <select id="timezone" name="timezone">
+                    <option value="UTC" {% if user.timezone == 'UTC' %}selected{% endif %}>UTC</option>
+                    <option value="EST" {% if user.timezone == 'EST' %}selected{% endif %}>Eastern Standard Time (EST)</option>
+                    <!-- Add more time zones as needed -->
+                </select>
+            </div>
+            <button type="submit" class="button">Update Preferences</button>
+        </form>
+    </div>
+
+    <div class="profile-section">
+        <h2>Storage Management</h2>
+        <div class="storage-management">
+            <p>Total Storage: <strong>{{ user.storage_limit }} GB</strong></p>
+            <p>Used Storage: <strong>{{ user.storage_used }} GB</strong></p>
+            <div class="storage-bar">
+                <div class="used-storage" style="width: {{ (user.storage_used / user.storage_limit) * 100 }}%;"></div>
+            </div>
+            <button type="button" class="button" onclick="window.location.href='{{ url_for('vault') }}';">Manage Files</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Additional JavaScript to handle form submissions or interactions
+</script>
+{% endblock %}
+

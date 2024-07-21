@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+    <h1>Admin Panel</h1>
+    <div class="button-container">
+        <a href="{{ url_for('logout') }}" class="button">Logout</a>
+    </div>
+    <h2>Delete User</h2>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <select name="delete_user_id">
+                {% for user in users %}
+                <option value="{{ user.id }}">{{ user.email }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="button-container">
+            <button type="submit" class="button">Delete User</button>
+        </div>
+    </form>
+    <h2>All Users</h2>
+    <table>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <form method="post" action="{{ url_for('admin') }}" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="delete_user_id" value="{{ user.id }}">
+                    <button type="submit" class="button">Delete</button>
+                </form>
+                <a href="{{ url_for('view_user_folders', username=user.username) }}" class="button">
+                    View Folder
+                </a>
+                <a href="{{ url_for('reset_user_password', user_id=user.id) }}" class="button">
+                    Reset Password
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+<style>
+    .button-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 1em;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        margin-bottom: 1em;
+    }
+    select {
+        width: 100%;
+        padding: 0.5em;
+        font-size: 1em;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2em;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 0.5em;
+        text-align: left;
+    }
+    th {
+        background-color: #333;
+        color: #fff;
+    }
+    td {
+        background-color: #444;
+    }
+    .button {
+        text-decoration: none;
+        color: #ffffff;
+        background-color: #bb86fc;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    .button:hover {
+        background-color: #9f66c3;
+    }
+    form {
+        display: inline;
+    }
+</style>
+

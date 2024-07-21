@@ -1,0 +1,40 @@
+{
+  "name": "LockItVault",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "axios": "^0.24.0",
+    "chokidar": "^3.5.2",
+    "electron": "^13.1.7"
+  },
+  "devDependencies": {
+    "electron-builder": "^22.14.5"
+  },
+  "build": {
+    "appId": "com.lockitvault.app",
+    "productName": "LockItVault",
+    "files": [
+      "**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
+  }
+}
+

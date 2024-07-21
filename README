@@ -1,0 +1,85 @@
+S3 Folder Sync Tool
+
+This tool monitors a local folder and synchronizes its contents with an S3 bucket. It provides a CLI interface to start/stop monitoring, check status, update configuration, perform manual synchronization, and view logs.
+Prerequisites
+
+    Python 3.x
+    boto3
+    watchdog
+    tqdm
+
+Installation
+
+    Clone the repository or download the script:
+
+    sh
+
+git clone <repository_url>
+cd <repository_folder>
+
+Install dependencies:
+
+sh
+
+    pip install boto3 watchdog tqdm
+
+Configuration
+
+Create a config.ini file in the same directory as the script if it does not already exist. The default configuration file will be created automatically when you run the script for the first time.
+Usage
+
+The script provides several CLI commands to manage folder synchronization.
+Start Monitoring
+
+Starts monitoring the specified folder for changes.
+
+sh
+
+python3 d2_free_2.0.py start --folder /path/to/watch
+
+Stop Monitoring
+
+Stops monitoring the folder.
+
+sh
+
+python3 d2_free_2.0.py stop
+
+Check Status
+
+Checks if the folder is currently being monitored.
+
+sh
+
+python3 d2_free_2.0.py status
+
+Update Configuration
+
+Updates the folder being monitored and saves the configuration.
+
+sh
+
+python3 d2_free_2.0.py config --folder /new/path/to/watch
+
+Manual Synchronization
+
+Performs a manual synchronization of the folder with the S3 bucket.
+
+sh
+
+python3 d2_free_2.0.py sync
+
+View Logs
+
+Displays the last 10 log entries.
+
+sh
+
+python3 d2_free_2.0.py logs
+
+Logging
+
+Logs are saved to sync.log in the same directory as the script. The log file contains detailed information about file operations and synchronization activities.
+License
+
+This project is licensed under the MIT License.

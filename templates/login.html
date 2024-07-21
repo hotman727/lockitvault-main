@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Login - LockItVault{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>LOGIN</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <form method="post" action="{{ url_for('login') }}">
+        {{ form.csrf_token }}
+        
+        <div class="form-group">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control", id="email", required=True) }}
+            {% if form.email.errors and request.method == 'POST' %}
+                {% for error in form.email.errors %}
+                    <span style="color: red;">[{{ error }}]</span><br>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control", id="password", required=True) }}
+            {% if form.password.errors and request.method == 'POST' %}
+                {% for error in form.password.errors %}
+                    <span style="color: red;">[{{ error }}]</span><br>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        <div class="form-check">
+            {{ form.remember(class="form-check-input", id="remember") }}
+            {{ form.remember.label(class="form-check-label", for="remember") }}
+        </div>
+        
+        <div class="button-container">
+            <button type="submit" class="button">Login</button>
+        </div>
+    </form>
+</div>
+<div class="footer">
+    &copy; 2024 LockItVault. All rights reserved.
+</div>
+{% endblock %}

@@ -1,0 +1,1342 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>{% block title %}LockItVault{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='bin/favicon.png') }}">
+    <link rel="texture" type="image/png" href="{{ url_for('static', filename='bin/planettexture.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            /* overflow: hidden; */
+            font-family: 'Roboto', sans-serif;
+            color: #ffffff;
+            background: black;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .star, .twinkling-star, .moving-star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            transition: opacity 3s ease-in-out;
+        }
+
+        .star {
+            width: 2px;
+            height: 2px;
+            opacity: 0.8;
+        }
+
+        .twinkling-star {
+            width: 2px;
+            height: 2px;
+            animation: twinkle 15s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .moving-star {
+            width: 2px;
+            height: 2px;
+            animation: move 30s linear infinite;
+        }
+
+        @keyframes move {
+            from { transform: scale(1); opacity: 0.1; }
+            to { transform: scale(3); opacity: 0; }
+        }
+
+        .nebula {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -500%;
+            left: -500%;
+            background: radial-gradient(circle, rgba(0,0,128,0.3), transparent);
+            animation: drift 120s infinite linear;
+            opacity: 0.2;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40%, 40%); }
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 0.5em;
+        }
+
+        p {
+            font-size: 1em;
+            margin-bottom: 1em;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 1em;
+        }
+        
+        .button-container-left {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+        
+        .upload_default_icon {
+            display: none;
+        }
+
+        .upload-button-container-left {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-left: 10px;
+        }
+
+        .button {
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #bb86fc;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:hover {
+            background-color: rgba(0, 0, 0, 0);
+            color: #ffffff;
+            background-color: #000000; /* Change background to black */
+            box-shadow: 0 0 2px #bb86fc, 0 0 7px #bb86fc, 0 0 11px #bb86fc, 0 0 15px #bb86fc;
+        }
+        
+        a.button {
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #bb86fc;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        a.button:hover {
+            background-color: rgba(0, 0, 0, 0);
+            color: #ffffff;
+            background-color: #000000; /* Change background to black */
+            box-shadow: 0 0 2px #bb86fc, 0 0 7px #bb86fc, 0 0 11px #bb86fc, 0 0 15px #bb86fc; /* Purple glow for button */
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.8em;
+            color: #888888;
+            width: 100%;
+            text-align: center;
+        }
+
+        .top-nav {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            padding-left: 20px;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            color: #ffffff;
+            background-color: transparent; 
+            padding: 0;        
+            border-radius: 0;           
+            transition: none;           
+            border: none;              
+            box-shadow: none;        
+            cursor: pointer;         
+            display: inline; 
+            font-size: 1.5em;
+            transition: text-shadow 0.3s ease-in-out;
+        }
+
+        .logo-link:hover {
+            text-shadow: 0 0 5px #bb86fc, 0 0 10px #bb86fc, 0 0 15px #bb86fc, 0 0 20px #bb86fc;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            padding-right: 20px;
+        }
+
+        .hamburger div {
+            width: 30px;
+            height: 3px;
+            background-color: #ffffff;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .hamburger:hover div {
+            box-shadow: 0 0 5px #bb86fc, 0 0 10px #bb86fc, 0 0 15px #bb86fc, 0 0 20px #bb86fc;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        /* New media query for small screens */
+        @media (max-width: 600px) {
+            .hamburger {
+                display: flex;
+            }
+        }
+
+        .nav-links {
+            display: none;
+        }
+
+        .nav-links.active {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: transparent;
+            box-shadow: none;
+            padding: 10px;
+            padding-right: 20px
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 1.5em;
+            margin-bottom: 5px; 
+            padding: 5px 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            text-shadow: 0 0 5px #bb86fc, 0 0 10px #bb86fc, 0 0 15px #bb86fc, 0 0 20px #bb86fc;
+            transition: text-shadow 0.3s ease-in-out;
+        }
+
+        .upload-area {
+            border: 2px dashed #ffffff; 
+            border-radius: 10px; 
+            padding: 10px;
+            text-align: center;
+            color: #bbb;
+            margin: 10px;
+            background-color: rgba(0, 0, 0, 0.8); 
+            transition: background-color 0.3s ease;
+            min-height: 150px;
+        }
+
+        #file-input {
+            display: none; 
+        }
+
+        .upload-form-container {
+            width: 85%;
+            height: 85%;
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 2px solid #bb86fc;
+            max-height: 900px;
+            overflow-y: auto; 
+            margin-bottom: 1em;
+            margin-left: 0;
+            margin-top: 80px;
+            background-color: rgba(0, 0, 0, 0.1);
+            box-sizing: content-box;
+        }
+
+        .upload-form-container h1 {
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 3px #bb86fc, 0 0 7px #bb86fc, 0 0 12px #bb86fc, 0 0 17px #bb86fc;
+        }
+
+        .upload-form-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+            margin-bottom: 1em;
+        }
+
+        .upload-form-group label {
+            font-size: 1.2em;
+            margin-bottom: 0.5em;
+            color: #ffffff;
+            text-align: left;
+            width: 100%;
+        }
+
+        .upload-form-group input {
+            width: calc(100% - 1.5em);
+            padding: 0.75em;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .upload-form-group input:focus {
+            border-color: #bb86fc;
+            box-shadow: 0 0 8px rgba(187, 134, 252, 0.6);
+            outline: none;
+        }
+
+        .form-container {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #bb86fc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 90%;
+            margin: auto;
+            text-align: center;
+            min-height: 200px;
+        }
+
+        .form-container h1 {
+            font-size: 2em;
+            margin-bottom: 1em;
+            text-shadow: 0 0 3px #bb86fc, 0 0 7px #bb86fc, 0 0 12px #bb86fc, 0 0 17px #bb86fc;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+            margin-bottom: 1em;
+        }
+
+        .form-group label {
+            font-size: 1.2em;
+            margin-bottom: 0.5em;
+            color: #ffffff;
+            text-align: left;
+            width: 100%;
+        }
+
+        .form-group input {
+            width: calc(100% - 1.5em);
+            padding: 0.75em;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #bb86fc;
+            box-shadow: 0 0 8px rgba(187, 134, 252, 0.6);
+            outline: none;
+        }
+
+        /* Table Styles */
+        .table-container {
+            width: 91%;
+            height: 90%;
+            margin: 0 auto;
+            overflow-x: auto;
+            padding-top: 1rem;
+            max-height: 900px;
+            overflow-y: auto; 
+            margin-bottom: 1em;
+            margin-left: 40px;
+        }
+
+        /* Style the scrollbar track */
+        .table-container::-webkit-scrollbar {
+            width: 15px;
+        }
+
+        /* Style the scrollbar thumb */
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #ffffff;
+            border-radius: 10px;
+            border: 3px solid #000000;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Change the thumb on hover */
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background-color: #bb86fc;
+        }
+        
+        /* Style the scrollbar track */
+        .table-container::-webkit-scrollbar-track {
+            border-radius: 10px;
+            position: relative;
+            margin-top: 118px;
+            margin-bottom: 8px;
+        }
+
+        .upload-table-container {
+            overflow-x: auto;
+            padding-top: 1rem;
+            overflow-y: auto; 
+            margin-bottom: 1em;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .file-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            border: 2px solid #bb86fc;
+            border-radius: 10px;
+        }
+
+        .file-table th, .file-table td {
+            border: 1px solid #ccc;
+            padding: 0.2em;
+            text-align: left;
+            font-size: 1em; /* Standardize font size */
+            height: 30px; /* Standardize height */
+        }
+
+        .file-table th {
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .file-table td {
+            background-color: #444;
+        }
+
+        .actions-column {
+            width: 50px;
+            padding: 0 0;
+            font-size: 1em;
+        }
+        
+        .name-column {
+            width: auto;
+            padding: 0 0;
+            font-size: 1em;
+        }
+
+        .file-table th.actions-column, .file-table td.actions-column {
+            width: 50px;
+            text-align: center;
+        }
+
+        .file-table th:first-child, .file-table td:first-child {
+            text-align: center;
+            width: 40px;
+        }
+
+        .file-table th:nth-child(2), .file-table td:nth-child(2) {
+            width: 600px; /* Set the desired width for the Name column */
+        }
+
+        /* Custom class to right-align the search form */
+        .right-align-form {
+            display: flex;
+            justify-content: flex-end;
+            padding-bottom: 10px;
+            padding-right: 20px;
+            align-items: center;
+        }
+
+        .right-align-input {
+            padding: 5px; /* Adjust padding */
+            font-size: 1em; /* Standardize font size */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px; /* Add some space between input and button */
+            height: 40px; /* Standardize height */
+        }
+
+        .right-align-button {
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #bb86fc;
+            padding: 5px 10px; /* Adjust padding */
+            border-radius: 5px;
+            font-size: 0.6em; /* Standardize font size */
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            height: 40px; /* Standardize height */
+        }
+        
+        .right-align-input:focus {
+            border-color: #bb86fc;
+            box-shadow: 0 0 2px #bb86fc, 0 0 4px #bb86fc, 0 0 6px #bb86fc, 0 0 8px #bb86fc;
+            outline: none; /* Remove the default focus outline */
+        }
+
+        .right-align-button:hover {
+            background-color: rgba(0, 0, 0, 0);
+            color: #ffffff;
+            background-color: #000000; /* Change background to black */
+            box-shadow: 0 0 2px #bb86fc, 0 0 7px #bb86fc, 0 0 11px #bb86fc, 0 0 15px #bb86fc;
+        }
+
+        .table-heading {
+            color: #ffffff;
+            text-decoration: none;
+            display: inline-block;
+            padding: 0 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em; /* Standardize font size */
+        }
+
+        .table-heading:hover {
+            text-shadow: 0 0 5px #bb86fc, 0 0 10px #bb86fc, 0 0 15px #bb86fc, 0 0 20px #bb86fc;
+        }
+        
+        /* Custom CSS for adding padding */
+        .vault-heading {
+            margin: 0; /* Ensure there is no extra margin around the heading */
+            display: flex; /* Use flexbox for the heading */
+            justify-content: space-between; /* Space items within the heading */
+            align-items: center; /* Center items vertically */
+            width: 100%; /* Ensure the heading takes the full width */
+            padding-top: 60px;
+        }
+
+        /* Flash messages */
+        .flashes {
+            list-style-type: none;
+            padding: 0;
+            margin: 0 0 1em 0;
+            width: 100%;
+        }
+
+        .flashes li {
+            padding: 1em;
+            margin-bottom: 0.5em;
+            border-radius: 5px;
+            color: #ffffff;
+        }
+
+        .flash-success {
+            background-color: #4CAF50;
+        }
+
+        .flash-error {
+            background-color: #f44336;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .form-container {
+                padding: 15px;
+            }
+
+            .form-group label {
+                font-size: 1em;
+            }
+
+            .form-group input {
+                padding: 0.5em;
+                font-size: 0.9em;
+            }
+
+            .button {
+                padding: 8px 16px;
+                font-size: 1em;
+            }
+
+            .table-container {
+                width: 100%;
+            }
+
+        }
+
+        /* New styles for top buttons */
+        .top-bar {
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 1rem;
+        }
+
+        .top-buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 50%;
+            margin: 1rem auto;
+            padding-bottom: 1rem;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            padding-right: 20px;
+        }
+
+        .search-form {
+            display: flex;
+            align-items: right;
+            margin-right: 0px;
+            margin-left: Auto;
+        }
+
+        .search-input {
+            padding: 5px; /* Adjust padding */
+            font-size: 1em; /* Standardize font size */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+            height: 22px; /* Standardize height */
+        }
+
+        .button-link {
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #bb86fc;
+            padding: 5px 10px; 
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            height: 35px;
+        }
+
+        .button-link:hover {
+            background-color: rgba(0, 0, 0, 0); /* Make background transparent */
+            color: #ffffff;
+            text-shadow
+        }
+        
+        .fixed-button-container {
+            position: fixed;
+            bottom: 20px;
+            left: 40px;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0);
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropbtn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            right: 0;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(0, 0, 0, 0);
+            color: #ffffff;
+            background-color: #000000; /* Change background to black */
+            box-shadow: 0 0 2px #bb86fc, 0 0 7px #bb86fc, 0 0 11px #bb86fc, 0 0 15px #bb86fc;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            color: #ffffff;
+            text-shadow: 0 0 2px #bb86fc, 0 0 7px #bb86fc, 0 0 11px #bb86fc, 0 0 15px #bb86fc;
+        }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.8); /* Dark background with opacity */
+        }
+
+        .modal-content {
+            background-color: rgba(0, 0, 0, 0.8); /* Dark background similar to form-container */
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #bb86fc;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            color: #ffffff; /* White text color */
+        }
+
+        .close-button {
+            color: #ffffff;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #000000;
+            text-decoration: none;
+            cursor: pointer;
+            text-shadow: 0 0 2px #bb86fc, 0 0 7px #bb86fc, 0 0 11px #bb86fc, 0 0 15px #bb86fc;
+        }
+
+        .modal-content p {
+            color: #ffffff; /* Ensure the paragraph text is black */
+            text-shadow: 0 0 2px #bb86fc, 0 0 7px #bb86fc, 0 0 11px #bb86fc, 0 0 15px #bb86fc;
+        }
+        
+        /* Styles specific to the form and checkbox */
+    
+        /* Style for the checkbox container */
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1em; /* Space between elements */
+        }
+
+        /* Style for the checkbox input */
+        .form-check-input {
+            width: 20px; /* Standardize width */
+            height: 20px; /* Standardize height */
+            margin-right: 10px; /* Space between checkbox and label */
+            accent-color: #bb86fc; /* Color that matches the button */
+        }
+
+        /* Style for the checkbox label */
+        .form-check-label {
+            font-size: 1em; /* Standardize font size */
+            color: #ffffff; /* Ensure the text color matches the theme */
+        }
+
+        /* Checkbox focus styling */
+        .form-check-input:focus {
+            outline: none; /* Remove default focus outline */
+            box-shadow: 0 0 8px rgba(187, 134, 252, 0.6); /* Purple glow similar to other inputs */
+        }
+
+        .profile-container {
+            width: 85%;
+            margin: 80px auto 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-section {
+            margin-bottom: 30px;
+        }
+
+        .profile-section h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 3px #bb86fc, 0 0 7px #bb86fc, 0 0 12px #bb86fc, 0 0 17px #bb86fc;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select {
+            /* width: 100%; */
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #bb86fc;
+            box-shadow: 0 0 8px rgba(187, 134, 252, 0.6);
+            outline: none;
+        }
+
+        .activity-log-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .activity-log-table th, .activity-log-table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .activity-log-table th {
+            background-color: #333;
+            color: #ffffff;
+        }
+
+        .activity-log-table td {
+            background-color: #444;
+            color: #ffffff;
+        }
+
+        .storage-bar {
+            width: 100%;
+            background-color: #555;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .used-storage {
+            height: 20px;
+            background-color: #bb86fc;
+        }
+
+        .contact-page-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            margin: 45px auto 0 auto; /* Adjust margin as needed */
+            padding: 20px;
+            overflow: hidden; /* To ensure no content spills out */
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Style the contact form container */
+        .contact-form-container {
+            max-width: 800px; /* Wider container */
+            width: 90%;
+            background-color: rgba(0, 0, 0, 0.8); /* Match the form container's background */
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #bb86fc; /* Purple border for consistency */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            max-height: calc(100vh - 100px); /* Ensure the form doesn't exceed viewport height */
+            overflow-y: auto; /* Add vertical scrollbar if content overflows */
+            margin: 60px auto 20px auto; /* Adjusted top margin */
+            text-align: center;
+            color: #ffffff; /* White text color */
+        }
+
+        /* Reduce the width of the "Choose File" button */
+        .contact-form-group input[type="file"] {
+            width: auto; /* Change from full width to auto */
+            padding: 10px; /* Add padding for better appearance */
+            background-color: #bb86fc; /* Match the button color */
+            color: #ffffff; /* White text color */
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Center the text inside the button */
+        }
+
+        /* Custom scrollbar styling for the contact form container */
+        .contact-form-container::-webkit-scrollbar {
+            width: 15px; /* Match the width of the table container scrollbar */
+        }
+
+        .contact-form-container::-webkit-scrollbar-track {
+            border-radius: 10px; /* Match the rounded corners of the track */
+            background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent dark background */
+            margin-top: 10px; /* Adjusted to fit within the form container */
+            margin-bottom: 10px; /* Adjusted to fit within the form container */
+        }
+
+        .contact-form-container::-webkit-scrollbar-thumb {
+            background-color: #ffffff; /* White color to match the table container */
+            border-radius: 10px; /* Rounded corners for the thumb */
+            border: 3px solid #000000; /* Dark border for contrast */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition effects */
+        }
+
+        .contact-form-container::-webkit-scrollbar-thumb:hover {
+            background-color: #bb86fc; /* Purple color on hover to match the theme */
+        }
+
+        /* Firefox scrollbar styling */
+        .contact-form-container {
+            scrollbar-width: thin;
+            scrollbar-color: #ffffff rgba(0, 0, 0, 0.3); /* White thumb and dark track */
+        }
+
+        /* Center the "Send Message" button */
+        .contact-form-group .button {
+            margin: 0 auto; /* Center the button horizontally */
+            display: block; /* Ensure the button behaves as a block-level element */
+        }
+
+        /* Style the contact form heading */
+        .contact-form-container h1 {
+            font-size: 2em;
+            margin-bottom: 1em;
+            text-shadow: 0 0 3px #bb86fc, 0 0 7px #bb86fc, 0 0 12px #bb86fc, 0 0 17px #bb86fc; /* Purple glow */
+        }
+
+        /* Style individual form groups */
+        .contact-form-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+            margin-bottom: 1em;
+        }
+
+        /* Style form labels */
+        .contact-form-group label {
+            font-size: 1.2em;
+            margin-bottom: 0.5em;
+            color: #ffffff; /* White text color */
+            text-align: left;
+            width: 100%;
+        }
+
+        /* Style form inputs and textarea */
+        .contact-form-group input,
+        .contact-form-group textarea {
+            width: calc(100% - 1.5em);
+            padding: 0.75em;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.8); /* Dark background */
+            color: #ffffff; /* White text color */
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* Style form inputs and textarea on focus */
+        .contact-form-group input:focus,
+        .contact-form-group textarea:focus {
+            border-color: #bb86fc; /* Purple border on focus */
+            box-shadow: 0 0 8px rgba(187, 134, 252, 0.6); /* Purple glow */
+            outline: none;
+        }
+
+        /* Adjust textarea resizing */
+        .contact-form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Style for file input */
+        .contact-form-group input[type="file"] {
+            display: none; /* Hide the default file input */
+        }
+
+        /* Custom label for the file input */
+        .custom-file-input-label {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #bb86fc;
+            color: #ffffff;
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Hover effect for the custom file input label */
+        .custom-file-input-label:hover {
+            background-color: rgba(0, 0, 0, 0);
+            color: #ffffff;
+            background-color: #000000; /* Change background to black */
+            box-shadow: 0 0 2px #bb86fc, 0 0 7px #bb86fc, 0 0 11px #bb86fc, 0 0 15px #bb86fc;
+        }
+
+        /* Style for the captcha container */
+        .captcha-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1em;
+        }
+
+        /* Style for error messages */
+        .error-message {
+            color: #f44336; /* Red for error messages */
+            margin-bottom: 1em;
+            text-align: left;
+            width: 100%;
+        }
+
+        /* Style for success messages */
+        .success-message {
+            color: #4CAF50; /* Green for success messages */
+            margin-bottom: 1em;
+            text-align: center;
+        }
+
+        /* Style for the submit button */
+        .button {
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #bb86fc;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Hover effect for the submit button */
+        .button:hover {
+            background-color: rgba(0, 0, 0, 0);
+            color: #ffffff;
+            background-color: #000000; /* Change background to black */
+            box-shadow: 0 0 2px #bb86fc, 0 0 7px #bb86fc, 0 0 11px #bb86fc, 0 0 15px #bb86fc;
+        }
+        
+        /* Custom scrollbar styling for the contact form container */
+        .contact-form-container::-webkit-scrollbar {
+            width: 15px; /* Match the width of the table container scrollbar */
+        }
+
+        .contact-form-container::-webkit-scrollbar-track {
+            border-radius: 10px; /* Match the rounded corners of the track */
+            background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent dark background */
+            margin-top: 10px; /* Adjusted to fit within the form container */
+            margin-bottom: 10px; /* Adjusted to fit within the form container */
+        }
+
+        .contact-form-container::-webkit-scrollbar-thumb {
+            background-color: #ffffff; /* White color to match the table container */
+            border-radius: 10px; /* Rounded corners for the thumb */
+            border: 3px solid #000000; /* Dark border for contrast */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition effects */
+        }
+
+        .contact-form-container::-webkit-scrollbar-thumb:hover {
+            background-color: #bb86fc; /* Purple color on hover to match the theme */
+        }
+
+        /* Firefox scrollbar styling */
+        .contact-form-container {
+            scrollbar-width: thin;
+            scrollbar-color: #ffffff rgba(0, 0, 0, 0.3); /* White thumb and dark track */
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <div class="logo">
+            <a href="/" class="logo-link">LockItVault</a>
+        </div>
+        <div class="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/vault">Vault</a>
+            <a href="/upload">Upload</a>
+            <a href="/recycle">Recycle</a>
+            <a href="/profile">Profile</a>
+            <a href="/features">Features</a>
+            <a href="/pricing">Pricing</a>
+            <a href="/contact">Contact</a>
+        </div>
+    </div>
+    <div class="background">
+        <div class="nebula"></div>
+        {% for star in static_stars %}
+        <div class="star" style="top: {{ star.top }}%; left: {{ star.left }}%;"></div>
+        {% endfor %}
+        {% for star in twinkling_stars %}
+        <div class="twinkling-star" style="top: {{ star.top }}%; left: {{ star.left }}%;"></div>
+        {% endfor %}
+        {% for star in moving_stars %}
+        <div class="moving-star" style="top: {{ star.top }}%; left: {{ star.left }}%;"></div>
+        {% endfor %}
+    </div>
+    {% block content %}{% endblock %}
+    <div class="footer">
+        &copy; 2024 LockItVault. All rights reserved.
+    </div>
+    
+        <!-- Modal HTML -->
+    <div id="upload-success-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p>Files uploaded successfully!</p>
+        </div>
+    </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle menu on hamburger click
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (hamburger) {
+            hamburger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!navLinks.contains(event.target) && !hamburger.contains(event.target)) {
+                    navLinks.classList.remove('active');
+                }
+            });
+        }
+
+        // Rendering Stars
+        {% if stars_data %}
+        const starData = {{ stars_data | tojson }};
+        
+        function renderStars(data) {
+            const starsContainer = document.querySelector('.background');
+            
+            data.static_stars.forEach(star => {
+                const starElement = document.createElement('div');
+                starElement.className = 'star';
+                starElement.style.top = star.top + '%';
+                starElement.style.left = star.left + '%';
+                starsContainer.appendChild(starElement);
+            });
+            
+            data.twinkling_stars.forEach(star => {
+                const starElement = document.createElement('div');
+                starElement.className = 'twinkling-star';
+                starElement.style.top = star.top + '%';
+                starElement.style.left = star.left + '%';
+                starsContainer.appendChild(starElement);
+            });
+            
+            data.moving_stars.forEach(star => {
+                const starElement = document.createElement('div');
+                starElement.className = 'moving-star';
+                starElement.style.top = star.top + '%';
+                starElement.style.left = star.left + '%';
+                starsContainer.appendChild(starElement);
+            });
+        }
+
+        // Call the rendering function for stars
+        if (starData) {
+            renderStars(starData);
+        }
+        {% endif %}
+
+        // New script logic for file upload functionality
+        const fileInput = document.getElementById('file-input');
+        const uploadArea = document.getElementById('upload-area');
+        const fileList = document.getElementById('file-list');
+        let filesArray = [];
+
+        if (uploadArea) {
+            uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            uploadArea.addEventListener('drop', dropHandler);
+            uploadArea.addEventListener('dragover', dragOverHandler);
+        }
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                addFiles(this.files);
+            });
+        }
+
+        function addFiles(files) {
+            filesArray = filesArray.concat(Array.from(files));
+            updateFileList();
+        }
+
+        function updateFileList() {
+            if (fileList) {
+                fileList.innerHTML = ''; // Clear existing list items
+                filesArray.forEach((file, index) => {
+                    let row = fileList.insertRow();
+                    let name = row.insertCell(0);
+                    let size = row.insertCell(1);
+                    let removeBtn = row.insertCell(2);
+                    name.textContent = file.name;
+                    size.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+                    let btn = document.createElement('button');
+                    btn.textContent = 'Remove';
+                    btn.onclick = function() {
+                        filesArray.splice(index, 1);
+                        updateFileList(); // Refresh the list
+                    };
+                    removeBtn.appendChild(btn);
+                });
+            }
+        }
+
+        function dropHandler(event) {
+            event.preventDefault();
+            const files = event.dataTransfer.files;
+            addFiles(files);
+        }
+
+        function dragOverHandler(event) {
+            event.preventDefault();
+        }
+
+        const uploadForm = document.getElementById('upload-form');
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+                const dataTransfer = new DataTransfer();
+                filesArray.forEach(file => dataTransfer.items.add(file));
+                fileInput.files = dataTransfer.files;
+                
+                const formData = new FormData(uploadForm);
+                fetch(uploadForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                    }
+                }).then(response => {
+                    if (response.status === 200) {
+                        console.log(response)
+                        showModal();
+                        filesArray = []; // Clear the file array
+                        updateFileList(); // Refresh the list
+                    } else {
+                        response.json().then(json => {
+                            alert(JSON.stringify(json.message));
+                        })
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while submitting the form.');
+                });
+            });
+        }
+        
+        // Trigger file input when the custom button is clicked
+        const customFileInput = document.querySelector('.custom-file-input');
+        const fileInputLabel = document.querySelector('.custom-file-input-label');
+
+        if (fileInputLabel && customFileInput) {
+            fileInputLabel.addEventListener('click', () => {
+                customFileInput.click();
+            });
+
+            // Display the selected file name when a file is chosen
+            customFileInput.addEventListener('change', function() {
+                if (customFileInput.files.length > 0) {
+                    fileInputLabel.textContent = customFileInput.files[0].name;
+                } else {
+                    fileInputLabel.textContent = 'Choose File';
+                }
+            });
+        }
+
+        // Modal logic
+        const modal = document.getElementById('upload-success-modal');
+        const closeButton = document.querySelector('.close-button');
+
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                modal.style.display = 'none';
+                window.location.href = '/vault' // redirect to Vault page
+            });
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                    window.location.href = '/vault' // redirect to Vault page
+                }
+            };
+        }
+
+        function showModal() {
+            if (modal) {
+                modal.style.display = 'block';
+            }
+        }
+    });
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

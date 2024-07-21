@@ -1,0 +1,16 @@
+LockItVault Ideas:
+1) Fix the search option to the folder contents page. Possibly add one to the recycle bin also?
+2) Restore and Permanently Delete buttons in the Recycle Bin Section of Folder Contents
+3) Fix the upload bar in the upload template
+4) 2 factor authentication login
+5) Share a folder (with options for how long the share link will remain active).
+6) Create a sub-folder option (and be able to share it, which includes the contents within it).
+7) Create a max size limitation for the free users (2 gigs - Same as DropBox).
+8) Move files option in the vault (to allow the users to move files around into various folders).
+9) Admin analytics (showing number of users, total storage, possibly geographical users (map with some indication of where the users are located, etc)). 
+10) Multi-language support. 
+11) Social media login options.
+12) Notification feed (just a button/logo in teh upper right-hand corner of the header that when clicked shows what recently happened, 'successsssful login at 13:53', 'successfully uploaded file <name>', etc). 
+13) Dynamic pages that allow the site to work better on different sized desktops (right now it looks really good on a 1920x1880 monitor, but.... smaller screens it doesn't look great due to how the site was built (my bad... I didn't account for this)). 
+14) Document conversion options (.docx to pdf, .png to .jpeg, etc). 
+15) AI integrations (summarize selected document, translate documents, answer questions from the contents of documents in a folder, etc).

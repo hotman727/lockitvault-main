@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to LockItVault{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Welcome to LockItVault</h1>
+    <p>Your secure file storage solution.</p>
+    <div class="button-container">
+        <a href="{{ url_for('register') }}" class="button">Register</a>
+        <a href="{{ url_for('login') }}" class="button">Login</a>
+    </div>
+</div>
+{% endblock %}
+
